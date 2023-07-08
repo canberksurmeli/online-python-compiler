@@ -17,7 +17,7 @@ Welcome to Diagram Previewer, an online Python application that allows you to ex
     docker compose up 
 
 ## Usage
-    After docker container starts service runs at [localhost:8081](http://localhost:8081)
+    After docker container starts service runs at http://localhost:8081
     
 
 ## Contributing
