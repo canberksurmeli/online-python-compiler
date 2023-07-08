@@ -1,0 +1,20 @@
+version: "3.9"
+services:
+  python-diagrams:
+    image: python:alpine3.8
+    networks:
+      net-universe:
+        ipv4_address: 10.6.0.2
+    ports:
+      - 8081:5000
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    command: [ "python", "app.py" ]
+networks:
+  net-universe:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.6.0.0/16
+          gateway: 10.6.0.1

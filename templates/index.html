@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    </meta>
+    <title>Online Kod Editörü</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/styles.css') }}">
+    <script>
+        async function render() {
+            document.getElementById("output-image").innerHTML = "";
+            document.getElementById("output-image").src = "";
+            const inputdata = editor.getValue();
+            const res = await fetch("/generate", {
+                method: "POST",
+                port: "5000",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ code: inputdata })
+            })
+            if (res.status == 467) {
+                res.body.getReader().read().then((result) => {
+                    const decoder = new TextDecoder();
+                    const decodedString = JSON.parse(decoder.decode(result.value)).msg;
+                    document.getElementById("download-button").style.display = "none"
+                    alert(decodedString);
+                });
+                return;
+            } else if (res.status >= 400) {
+                alert("Bilinmeyen bir hata oluştu");
+                return;
+            }
+            const blob = await res.blob();
+            const imageUrl = URL.createObjectURL(blob);
+            document.getElementById("output-image").src = imageUrl;
+            document.getElementById("download-button").style.display = "inline-block"
+
+        }
+
+        function moreButton() {
+            const link = "https://diagrams.mingrammer.com/docs/getting-started/examples";
+            window.open(link, "_blank");
+
+        }
+
+        async function save() {
+            const inputdata = editor.getValue();
+            const filename = "diagram.txt"; // Dosya adı
+
+            const element = document.createElement("a");
+            element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(inputdata));
+            element.setAttribute("download", filename);
+            element.style.display = "none";
+            element.click();
+
+        }
+        function downloadImage() {
+            const outputImage = document.getElementById("output-image");
+            const url = outputImage.src;
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "diagram.png";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+    </script>
+</head>
+
+<body>
+    <div id="container">
+        <div id="input-output-container">
+            <div id="input-container">
+                <div id="toolbar">
+                    <div class="main-menu-container">
+                        <h1 class="main-menu-item">Online Python Editor</h1>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="misc-button" onclick="addButton()">Add</button>
+                        <button class="misc-button" onclick="moreButton()">Docs</button>
+                        <button class="misc-button" onclick="save()">Save</button>
+                        <button class="run-button" onclick="render()">Render</button>
+                    </div>
+                </div>
+                <div id="editor">
+                </div>
+            </div>
+            <div id="output-container">
+                <img id="output-image" src="">
+                <button id="download-button" class="run-button" onclick="downloadImage()">Download</button>
+            </div>
+        </div>
+    </div>
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+
+        <!-- Modal content -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close">&times;</span>
+                <h2>Modal Header</h2>
+            </div>
+            <div class="modal-body-container">
+
+                <div class="tab">
+                    <button class="tablinks" onclick="openCity(event, 'London')" id="defaultOpen"> <img
+                            src="{{ url_for('static',filename='logo/aws.png') }}" height="25px" width="50px"
+                            alt="logo" />
+                    </button>
+                    <button class="tablinks" onclick="openCity(event, 'Paris')"><img
+                            src="{{ url_for('static',filename='logo/azure.jpg') }}" height="25px" width="50px"
+                            alt="logo" /></button>
+                    <button class="tablinks" onclick="openCity(event, 'Tokyo')"></button>
+                </div>
+
+                <div id="London" class="tabcontent">
+                    <ul>
+                        <li>
+                            <div id="aws-1"> <img src="{{ url_for('static',filename='logo/cloudsearch.png') }}"
+                                    style="margin: 20px;" height="50px" width="75px" alt="logo"> Analytics </img>
+                            </div>
+                        </li>
+                        <li>
+                            <div id="aws-2"> <img src="{{ url_for('static',filename='logo/athena.png') }}" height="50px"
+                                    width="75px" style="margin: 20px;" alt="logo">Athena </img></div>
+                        </li>
+                    </ul>
+
+                </div>
+
+                <div id="Paris" class="tabcontent">
+                    <ul>
+                        <li>
+                            <div id="azure-1"> <img src="{{ url_for('static',filename='logo/analysis-services.png') }}"
+                                    style="margin: 20px;" height="50px" width="75px" alt="logo">Analysis Services </img>
+                            </div>
+                        </li>
+                        <li>
+                            <div id="azure-2"> <img
+                                    src="{{ url_for('static',filename='logo/data-explorer-clusters.png') }}"
+                                    height="50px" width="75px" style="margin: 20px;" alt="logo">Data Explorer Clusters
+                                </img>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.23.1/ace.js"></script>
+    <script>
+        let clicked;
+
+        function openCity(evt, cityName) {
+            let i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(cityName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
+        document.getElementById("aws-1").onclick = function () {
+            //highlight the clicked element
+            this.style.backgroundColor = "#ff3300";
+            //reset the others
+            document.getElementById("aws-2").style.backgroundColor = "white";
+
+            if (!editor.getValue().includes("from diagrams.aws.analytics import Analytics")) {
+                editor.session.insert({
+                    row: 0,
+                    column: 0
+                }, "from diagrams.aws.analytics import Analytics\n");
+            }
+        };
+
+        document.getElementById("aws-2").onclick = function () {
+            //highlight the clicked element
+            this.style.backgroundColor = "#ff3300";
+            //reset the others
+            document.getElementById("aws-1").style.backgroundColor = "white";
+
+            if (!editor.getValue().includes("from diagrams.aws.analytics import Athena")) {
+                editor.session.insert({
+                    row: 0,
+                    column: 0
+                }, "from diagrams.aws.analytics import Athena\n");
+            }
+        };
+
+        document.getElementById("azure-1").onclick = function () {
+            //highlight the clicked element
+            this.style.backgroundColor = "#ff3300";
+            //reset the others
+            document.getElementById("azure-2").style.backgroundColor = "white";
+
+            if (!editor.getValue().includes("from diagrams.azure.analytics import AnalysisServices")) {
+                editor.session.insert({
+                    row: 0,
+                    column: 0
+                }, "from diagrams.azure.analytics import AnalysisServices\n");
+            }
+        };
+
+        document.getElementById("azure-2").onclick = function () {
+            //highlight the clicked element
+            this.style.backgroundColor = "#ff3300";
+            //reset the others
+            document.getElementById("azure-1").style.backgroundColor = "white";
+
+            if (!editor.getValue().includes("from diagrams.azure.analytics import DataExplorerClusters")) {
+                editor.session.insert({
+                    row: 0,
+                    column: 0
+                }, "from diagrams.azure.analytics import DataExplorerClusters\n");
+            }
+        };
+
+
+
+        // Get the element with id="defaultOpen" and click on it
+        document.getElementById("defaultOpen").click();
+
+        const modal = document.getElementById("myModal");
+
+        // Get the <span> element that closes the modal
+        const span = document.getElementsByClassName("close")[0];
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+        function addButton() {
+            modal.style.display = "block";
+            document.getElementsByClassName("ace_gutter")[0].style.zIndex = "0";
+        }
+        const editor = ace.edit('editor');
+        editor.setTheme("ace/theme/chrome");
+        editor.session.setMode("ace/mode/python");
+        editor.setValue(`from diagrams import Diagram
+from diagrams.aws.compute import EC2
+from diagrams.aws.database import RDS
+from diagrams.aws.network import ELB
+
+with Diagram("Web Service", show=False):
+    ELB("lb") >> EC2("web") >> RDS("userdb")`, -1);
+    </script>
+</body>
+
+</html>
